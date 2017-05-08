@@ -18,7 +18,6 @@ Pod::Spec.new do |s|
                    DESC
 
   s.homepage     = "https://github.com/imadeit/ZLDropdownMenu"
-  s.screenshots  = "https://github.com/imadeit/ZLDropdownMenu/blob/master/demo.gif", "https://github.com/imadeit/ZLDropdownMenu/blob/master/demo1.gif"
 
   s.license      = { :type => 'MIT', :file => 'LICENSE' }
 
@@ -28,7 +27,7 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '8.0'
 
   s.source       = { :git => "https://github.com/imadeit/ZLDropdownMenu.git", :tag => "#{s.version}" }
-  s.source_files  = "Source/*.{h,m}"
+  s.source_files  = "ZLDropDownMenu/Categories/*.{h,m}", "ZLDropDownMenu/Utils/Masonry/*.{h,m}", "ZLDropDownMenu/*.{h,m}"
 
   s.requires_arc = true
 
