@@ -1,0 +1,25 @@
+Version 0.1.0
+ - Adjust sample project.
+ - Fix podspec file.
+ - Add podspec file.
+ - fix #15
+ - 2016年09月21日14:37:20 fix #11 (fix the conflict of tapGesture)
+ - 2016年09月21日14:37:20 fix 11 (fix the conflict of tapGesture)
+ - 2016年09月21日14:35:46 fix the conflict of tapGesture
+ - 2016年09月20日16:11:02 add gitignore
+ - 2016年09月20日15:13:45 fix the animation bug on iOS10
+ - 2016年09月20日15:13:45 fix the animation bug on iOS10
+ - fix #7(fix the bug which refer the crash when run on the iPhone or iPad)
+ - 2016年07月09日13:35:00 fix #6
+ - 2016年07月09日13:30:47 fix#6
+ - 2016年06月28日11:16:54 fix #3(fix the bug which can't show when the menu is the head or cell of the tableView)
+ - 2016年05月11日19:39:09 fix the memory leaks
+ - 2016年04月25日17:53:26 fix the animation bug
+ - 2016年04月21日17:35:55 修复连续点击动画bug
+ - 2016-01-30 02:22:51 README
+ - 2016-01-30 02:19:39
+ - 2016-01-30 01:17:49 README
+ - 2016年01月29日23:16:13 README
+ - 2016年01月29日23:05:11 初版
+ - Initial commit
+
