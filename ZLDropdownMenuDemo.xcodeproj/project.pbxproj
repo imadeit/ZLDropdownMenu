@@ -232,6 +232,7 @@
 				TargetAttributes = {
 					3009769F1C5BB2EE00DF525C = {
 						CreatedOnToolsVersion = 7.2;
+						DevelopmentTeam = F2SCXDG35A;
 					};
 				};
 			};
@@ -404,10 +405,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = F2SCXDG35A;
 				INFOPLIST_FILE = ZLDropdownMenuDemo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.smrz.ZLDropdownMenuDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.leon.app.sample.ZLDropdownMenuDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -417,10 +419,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = F2SCXDG35A;
 				INFOPLIST_FILE = ZLDropdownMenuDemo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.smrz.ZLDropdownMenuDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.leon.app.sample.ZLDropdownMenuDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
