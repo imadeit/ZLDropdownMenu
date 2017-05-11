@@ -10,7 +10,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "ZLDropdownMenu"
-  s.version      = "1.0.0"
+  s.version      = "1.0.1"
   s.summary      = "Awesome Dropdown menu for iOS in Objective-C with selected conditions shown under menu."
 
   s.description  = <<-DESC
