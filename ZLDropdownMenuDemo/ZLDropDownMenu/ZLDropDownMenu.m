@@ -39,6 +39,8 @@ typedef void(^ZLDropDownMenuAnimateCompleteHandler)(void);
 @property (nonatomic, strong) UICollectionView *collectionView;
 
 @property (nonatomic, weak) UIWindow *window;
+// Fix navigation back will not dismiss expanded menu options, Leon.
+@property (nonatomic, readonly) UIViewController *parentViewController;
 
 //  dataSource
 @property (nonatomic, copy) NSArray *array;
@@ -56,7 +58,7 @@ static NSString * const collectionCellID = @"ZLDropDownMenuCollectionViewCell";
     if (self = [super initWithFrame:frame]) {
         _currentSelectedMenuIndex = -1;
         _show = NO;
-        
+
         UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
         flowLayout.sectionInset = dropDownMenuCollectionViewUIValue()->SECTIONINSETS;
         flowLayout.itemSize = dropDownMenuCollectionViewUIValue()->ITEMSIZE;
@@ -70,15 +72,15 @@ static NSString * const collectionCellID = @"ZLDropDownMenuCollectionViewCell";
         _collectionView.dataSource = self;
         _collectionView.autoresizesSubviews = NO;
         self.autoresizesSubviews = NO;
-        
-//        _backgroundView = [[UIView alloc] init];
+
+        //        _backgroundView = [[UIView alloc] init];
         _backgroundView = [UIButton buttonWithType:UIButtonTypeCustom];
         _backgroundView.userInteractionEnabled = YES;
         _backgroundView.backgroundColor = [UIColor colorWithWhite:0.f alpha:0.f];
         _backgroundView.opaque = NO;
         [_backgroundView addTarget:self action:@selector(backgroundViewDidTap:) forControlEvents:UIControlEventTouchUpInside];
-//        UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(backgroundViewDidTap:)];
-//        [_backgroundView addGestureRecognizer:tapGesture];
+        //        UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(backgroundViewDidTap:)];
+        //        [_backgroundView addGestureRecognizer:tapGesture];
         _window = [self keyWindow];
     }
     return self;
@@ -96,13 +98,13 @@ static NSString * const collectionCellID = @"ZLDropDownMenuCollectionViewCell";
     _dataSource = dataSource;
     NSAssert([_dataSource respondsToSelector:@selector(numberOfColumnsInMenu:)], @"does not respond 'numberOfColumnsInMenu:' method");
     _numOfMenu = [_dataSource numberOfColumnsInMenu:self];
-    
+
     WS(weakSelf);
     CGFloat width = deviceWidth() / _numOfMenu;
     _titleButtons = [NSMutableArray arrayWithCapacity:_numOfMenu];
     ZLDropDownMenuTitleButton *lastTitleButton = nil;
     for (NSInteger index = 0; index < _numOfMenu; index++) {
-        
+
         NSString *titleString = [_dataSource menu:self titleForRowAtIndexPath:[ZLIndexPath indexPathWithColumn:index row:0]];
         ZLDropDownMenuTitleButton *titleButton = [[ZLDropDownMenuTitleButton alloc] initWithMainTitle:[_dataSource menu:self titleForColumn:index] subTitle:titleString];
         [self addSubview:titleButton];
@@ -112,7 +114,7 @@ static NSString * const collectionCellID = @"ZLDropDownMenuCollectionViewCell";
             make.width.mas_equalTo(width);
             make.left.equalTo(lastTitleButton ? lastTitleButton.mas_right : weakSelf);
         }];
-        
+
 
         lastTitleButton = titleButton;
         if (index != _numOfMenu - 1) {
@@ -131,9 +133,9 @@ static NSString * const collectionCellID = @"ZLDropDownMenuCollectionViewCell";
 
 #pragma mark - animation method
 - (void)animationWithTitleButton:(ZLDropDownMenuTitleButton *)button BackgroundView:(UIView *)backgroundView
-                     collectionView:(UICollectionView *)collectionView
-                               show:(BOOL)isShow
-                           complete:(ZLDropDownMenuAnimateCompleteHandler)complete
+                  collectionView:(UICollectionView *)collectionView
+                            show:(BOOL)isShow
+                        complete:(ZLDropDownMenuAnimateCompleteHandler)complete
 {
     WS(weakSelf);
     if (self.selectedButton == button) {
@@ -155,7 +157,7 @@ static NSString * const collectionCellID = @"ZLDropDownMenuCollectionViewCell";
 
 - (void)animationWithBackgroundView:(UIView *)backgroundView
                      collectionView:(UICollectionView *)collectionView
-                            show:(BOOL)isShow
+                               show:(BOOL)isShow
                            complete:(ZLDropDownMenuAnimateCompleteHandler)complete
 {
     WS(weakSelf);
@@ -172,14 +174,22 @@ static NSString * const collectionCellID = @"ZLDropDownMenuCollectionViewCell";
                            complete:(ZLDropDownMenuAnimateCompleteHandler)complete
 {
     WS(weakSelf);
+    // NSLog(@"%d, %ld", isShow, clickCount);
     if (isShow) {
-        if (1 == clickCount) {
-            [self.window addSubview:backgroundView];
+        // In some timing, clickCount will be more than 1, which cause the options not be shown, Leon fix.
+        if (1 == clickCount || ![backgroundView isDescendantOfView:self.parentViewController.view]) {
+            // [self.window addSubview:backgroundView]; // Original
+            // Fix navigation back will not dismiss expanded menu options, Leon.
+            [self.parentViewController.view addSubview:backgroundView];
             [backgroundView addSubview:self.collectionView];
             [_backgroundView mas_makeConstraints:^(MASConstraintMaker *make) {
-                CGRect rect = [weakSelf convertRect:weakSelf.bounds toView:weakSelf.window];
+                // CGRect rect = [weakSelf convertRect:weakSelf.bounds toView:weakSelf.window]; // Original
+                // Fix navigation back will not dismiss expanded menu options, Leon.
+                CGRect rect = [weakSelf convertRect:weakSelf.bounds toView:weakSelf.parentViewController.view];
                 make.top.mas_equalTo(CGRectGetMaxY(rect));
-                make.left.right.bottom.equalTo(weakSelf.window);
+                // make.left.right.bottom.equalTo(weakSelf.window); // Original
+                // Fix navigation back will not dismiss expanded menu options, Leon.
+                make.left.right.bottom.equalTo(weakSelf.parentViewController.view);
             }];
             [self.collectionView mas_remakeConstraints:^(MASConstraintMaker *make) {
                 make.top.left.right.equalTo(weakSelf.backgroundView);
@@ -189,6 +199,8 @@ static NSString * const collectionCellID = @"ZLDropDownMenuCollectionViewCell";
         }
         [UIView animateWithDuration:dropDownMenuUIValue()->ANIMATION_DURATION animations:^{
             backgroundView.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.3];
+            // Fix navigation back will not dismiss expanded menu options, Leon.
+            [self.parentViewController.view bringSubviewToFront: backgroundView];
         } completion:^(BOOL finished) {
         }];
     } else {
@@ -216,7 +228,7 @@ static NSString * const collectionCellID = @"ZLDropDownMenuCollectionViewCell";
             collectionViewHeight = dropDownMenuCollectionViewUIValue()->VIEW_TOP_BOTTOM_MARGIN * 2 + dropDownMenuCollectionViewUIValue()->CELL_HEIGHT * rowCount + dropDownMenuCollectionViewUIValue()->LINESPACING * (rowCount - 1);
             CGFloat maxHeight = deviceHeight() - CGRectGetMaxY(self.frame);
             collectionViewHeight = collectionViewHeight > maxHeight ? maxHeight : collectionViewHeight;
-            
+
             if (1 == clickCount) {
                 self.coverLayerView.hidden = NO;
                 [UIView animateWithDuration:dropDownMenuUIValue()->ANIMATION_DURATION animations:^{
@@ -230,19 +242,19 @@ static NSString * const collectionCellID = @"ZLDropDownMenuCollectionViewCell";
                 }];
             } else {
                 [UIView animateWithDuration:dropDownMenuUIValue()->ANIMATION_DURATION animations:^{
-                [collectionView mas_updateConstraints:^(MASConstraintMaker *make) {
-                    make.height.mas_equalTo(collectionViewHeight);
+                    [collectionView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.height.mas_equalTo(collectionViewHeight);
+                    }];
+                    [collectionView.superview layoutIfNeeded];
                 }];
-                [collectionView.superview layoutIfNeeded];
-            }];
-        
+
             }
         }
-        
-        
+
+
     } else {
         if (collectionView) {
-            
+
             [UIView animateWithDuration:dropDownMenuUIValue()->ANIMATION_DURATION animations:^{
                 [collectionView mas_updateConstraints:^(MASConstraintMaker *make) {
                     make.height.mas_equalTo(0);
@@ -272,6 +284,20 @@ static NSString * const collectionCellID = @"ZLDropDownMenuCollectionViewCell";
     return [[[UIApplication sharedApplication] windows] lastObject];
 }
 
+// Leon added for adding menu view in current view controller, or it will not be dismissed when navigation back.
+- (UIViewController *)parentViewController
+{
+    UIResponder *responder = self.nextResponder;
+    while (![responder isKindOfClass:[UIViewController class]]) {
+        responder = [responder nextResponder];
+        if (nil == responder) {
+            break;
+        }
+    }
+    return (UIViewController *)responder;
+}
+
+
 #pragma mark -- lazyLoad
 - (UIView *)coverLayerView
 {
@@ -280,7 +306,9 @@ static NSString * const collectionCellID = @"ZLDropDownMenuCollectionViewCell";
         _coverLayerView.frame = [self screenBounds];
         _coverLayerView.backgroundColor = [UIColor clearColor];
         _coverLayerView.hidden = YES;
-        [self.window addSubview:_coverLayerView];
+        // [self.window addSubview:_coverLayerView];
+        // Fix navigation back will not dismiss expanded menu options, Leon.
+        [self.parentViewController.view addSubview:_coverLayerView];
     }
     return _coverLayerView;
 }
@@ -328,7 +356,7 @@ static NSInteger clickCount;
 {
     NSAssert([self.dataSource respondsToSelector:@selector(menu:numberOfRowsInColumns:)], @"does not respond the 'menu:numberOfRowsInColumns:' method");
     return [self.dataSource menu:self numberOfRowsInColumns:self.currentSelectedMenuIndex];
-    
+
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
